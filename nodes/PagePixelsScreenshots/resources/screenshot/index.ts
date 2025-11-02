@@ -49,22 +49,228 @@ const commonOptionFields: INodeProperties[] = [
 	{
 		displayName: 'Multi-Step Actions',
 		name: 'multiStepActions',
-		type: 'collection',
+		type: 'fixedCollection',
+		default: {},
 		typeOptions: {
 			multipleValues: true,
-			multipleValueButtonText: 'Add Action',
 		},
-		default: [],
+		placeholder: 'Add Action',
 		options: [
 			{
-				displayName: 'Action JSON',
-				name: 'action',
-				type: 'string',
-				default: '',
-				description: 'Provide a JSON action definition (example: {"type":"click","selector":"#login"})',
-				typeOptions: {
-					rows: 2,
-				},
+				name: 'click',
+				displayName: 'Click',
+				values: [
+					{
+						displayName: 'Selector',
+						name: 'selector',
+						type: 'string',
+						default: '',
+						description: 'CSS selector to click before capturing the screenshot',
+					},
+				],
+			},
+			{
+				name: 'hover',
+				displayName: 'Hover',
+				values: [
+					{
+						displayName: 'Selector',
+						name: 'selector',
+						type: 'string',
+						default: '',
+						description: 'CSS selector to hover over before capturing the screenshot',
+					},
+				],
+			},
+			{
+				name: 'change',
+				displayName: 'Change Notification',
+				values: [
+					{
+						displayName: 'Selector',
+						name: 'selector',
+						type: 'string',
+						default: '',
+						description: 'CSS selector that identifies the element to monitor for changes',
+					},
+					{
+						displayName: 'Send To',
+						name: 'sendTo',
+						type: 'options',
+						options: [
+							{ name: 'Slack', value: 'slack' },
+							{ name: 'Webhook', value: 'webhook' },
+						],
+						default: '',
+						description: 'Where to send the change notification (optional)',
+					},
+					{
+						displayName: 'Webhook URL',
+						name: 'url',
+						type: 'string',
+						default: '',
+						description: 'Webhook URL to notify when Send To is Webhook',
+					},
+					{
+						displayName: 'Custom ID',
+						name: 'customId',
+						type: 'string',
+						default: '',
+						description: 'Optional identifier to correlate notifications',
+					},
+				],
+			},
+			{
+				name: 'redirect',
+				displayName: 'Goto URL',
+				values: [
+					{
+						displayName: 'URL',
+						name: 'value',
+						type: 'string',
+						default: '',
+						description: 'URL to visit before capturing the screenshot',
+					},
+				],
+			},
+			{
+				name: 'javascript',
+				displayName: 'Run Javascript',
+				values: [
+					{
+						displayName: 'Script',
+						name: 'value',
+						type: 'string',
+						typeOptions: {
+							rows: 4,
+						},
+						default: '',
+						description: 'JavaScript to run in the browser before capture',
+					},
+				],
+			},
+			{
+				name: 'evaluateJs',
+				displayName: 'Evaluate Javascript',
+				values: [
+					{
+						displayName: 'Script',
+						name: 'value',
+						type: 'string',
+						typeOptions: {
+							rows: 4,
+						},
+						default: '',
+						description: 'Javascript expression to evaluate and return a result',
+					},
+				],
+			},
+			{
+				name: 'css',
+				displayName: 'Insert CSS',
+				values: [
+					{
+						displayName: 'CSS',
+						name: 'value',
+						type: 'string',
+						typeOptions: {
+							rows: 4,
+						},
+						default: '',
+						description: 'CSS to inject prior to taking the screenshot',
+					},
+				],
+			},
+			{
+				name: 'text_field',
+				displayName: 'Text Field Input',
+				values: [
+					{
+						displayName: 'Selector',
+						name: 'selector',
+						type: 'string',
+						default: '',
+						description: 'CSS selector for the text field',
+					},
+					{
+						displayName: 'Value',
+						name: 'value',
+						type: 'string',
+						default: '',
+						description: 'Text to enter into the field',
+					},
+				],
+			},
+			{
+				name: 'select',
+				displayName: 'Dropdown Field Selection',
+				values: [
+					{
+						displayName: 'Selector',
+						name: 'selector',
+						type: 'string',
+						default: '',
+						description: 'CSS selector for the dropdown field',
+					},
+					{
+						displayName: 'Value',
+						name: 'value',
+						type: 'string',
+						default: '',
+						description: 'Option value to select',
+					},
+				],
+			},
+			{
+				name: 'checkbox',
+				displayName: 'Checkbox Field Input',
+				values: [
+					{
+						displayName: 'Selector',
+						name: 'selector',
+						type: 'string',
+						default: '',
+						description: 'CSS selector for the checkbox input',
+					},
+					{
+						displayName: 'Checked',
+						name: 'value',
+						type: 'boolean',
+						default: true,
+						description: 'Whether the checkbox should be checked',
+					},
+				],
+			},
+			{
+				name: 'submit',
+				displayName: 'Press Enter (Submit)',
+				values: [],
+			},
+			{
+				name: 'wait',
+				displayName: 'Wait X Milliseconds',
+				values: [
+					{
+						displayName: 'Milliseconds',
+						name: 'value',
+						type: 'string',
+						default: '',
+						description: 'Time to wait before continuing (e.g. 5000)',
+					},
+				],
+			},
+			{
+				name: 'wait_for_selector',
+				displayName: 'Wait For Selector',
+				values: [
+					{
+						displayName: 'Selector',
+						name: 'selector',
+						type: 'string',
+						default: '',
+						description: 'CSS selector to wait for before proceeding',
+					},
+				],
 			},
 		],
 		routing: {
@@ -72,7 +278,7 @@ const commonOptionFields: INodeProperties[] = [
 				type: 'query',
 				property: 'multi_step_actions',
 				value:
-					'={{$value.filter(item => item.action !== undefined && item.action !== "").map(item => item.action)}}',
+					'={{Array.isArray($value) ? $value.map(item => { const entry = Object.entries(item)[0]; if (!entry) return null; const [type, data] = entry; if (!data) return null; const payload = { type }; if (data.selector) payload.selector = data.selector; if (data.value !== undefined && data.value !== null && data.value !== "") payload.value = data.value; if (data.sendTo) payload.send_to = data.sendTo; if (data.url) payload.url = data.url; if (data.customId) payload.custom_id = data.customId; return JSON.stringify(payload); }).filter(item => item) : []}}',
 			},
 		},
 	},
@@ -263,19 +469,30 @@ const commonOptionFields: INodeProperties[] = [
 	{
 		displayName: 'HTTP Headers',
 		name: 'headers',
-		type: 'collection',
+		type: 'fixedCollection',
+		default: {},
 		typeOptions: {
 			multipleValues: true,
-			multipleValueButtonText: 'Add Header',
 		},
-		default: [],
+		placeholder: 'Add Header',
 		options: [
 			{
-				displayName: 'Header',
 				name: 'header',
-				type: 'string',
-				default: '',
-				placeholder: 'Name: value',
+				displayName: 'Header',
+				values: [
+					{
+						displayName: 'Name',
+						name: 'name',
+						type: 'string',
+						default: '',
+					},
+					{
+						displayName: 'Value',
+						name: 'value',
+						type: 'string',
+						default: '',
+					},
+				],
 			},
 		],
 		routing: {
@@ -283,26 +500,37 @@ const commonOptionFields: INodeProperties[] = [
 				type: 'query',
 				property: 'headers',
 				value:
-					'={{$value.filter(item => item.header !== undefined && item.header !== "").map(item => item.header)}}',
+					'={{Array.isArray($value) ? $value.filter(item => item.header?.name && item.header?.value).map(item => item.header.name + ":" + item.header.value) : []}}',
 			},
 		},
 	},
 	{
 		displayName: 'Cookies',
 		name: 'cookies',
-		type: 'collection',
+		type: 'fixedCollection',
+		default: {},
 		typeOptions: {
 			multipleValues: true,
-			multipleValueButtonText: 'Add Cookie',
 		},
-		default: [],
+		placeholder: 'Add Cookie',
 		options: [
 			{
-				displayName: 'Cookie',
 				name: 'cookie',
-				type: 'string',
-				default: '',
-				placeholder: 'cookie_name=value; Path=/',
+				displayName: 'Cookie',
+				values: [
+					{
+						displayName: 'Name',
+						name: 'name',
+						type: 'string',
+						default: '',
+					},
+					{
+						displayName: 'Value',
+						name: 'value',
+						type: 'string',
+						default: '',
+					},
+				],
 			},
 		],
 		routing: {
@@ -310,7 +538,7 @@ const commonOptionFields: INodeProperties[] = [
 				type: 'query',
 				property: 'cookies',
 				value:
-					'={{$value.filter(item => item.cookie !== undefined && item.cookie !== "").map(item => item.cookie)}}',
+					'={{Array.isArray($value) ? $value.filter(item => item.cookie?.name && item.cookie?.value).map(item => item.cookie.name + "=" + item.cookie.value) : []}}',
 			},
 		},
 	},

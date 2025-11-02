@@ -6,12 +6,12 @@
 	"resources": {
 		"credentialDocumentation": [
 			{
-				"url": "https://github.com/PagePixels/n8n-nodes-pagepixels-screenshots#credentials"
+				"url": "https://pagepixels.com/app/screenshots-api-documentation#authentication"
 			}
 		],
 		"primaryDocumentation": [
 			{
-				"url": "https://github.com/PagePixels/n8n-nodes-pagepixels-screenshots#readme"
+				"url": "https://pagepixels.com/app/screenshots-api-documentation"
 			}
 		]
 	}
