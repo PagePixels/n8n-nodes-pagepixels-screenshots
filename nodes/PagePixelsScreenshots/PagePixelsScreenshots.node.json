@@ -1,0 +1,18 @@
+{
+	"node": "n8n-nodes-pagepixels-screenshots",
+	"nodeVersion": "1.0",
+	"codexVersion": "1.0",
+	"categories": ["Media", "Developer Tools"],
+	"resources": {
+		"credentialDocumentation": [
+			{
+				"url": "https://github.com/PagePixels/n8n-nodes-pagepixels-screenshots#credentials"
+			}
+		],
+		"primaryDocumentation": [
+			{
+				"url": "https://github.com/PagePixels/n8n-nodes-pagepixels-screenshots#readme"
+			}
+		]
+	}
+}

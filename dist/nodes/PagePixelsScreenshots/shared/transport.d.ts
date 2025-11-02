@@ -1,0 +1,2 @@
+import type { IDataObject, IExecuteFunctions, IExecuteSingleFunctions, IHookFunctions, IHttpRequestMethods, ILoadOptionsFunctions } from 'n8n-workflow';
+export declare function pagepixelsApiRequest(this: IHookFunctions | IExecuteFunctions | IExecuteSingleFunctions | ILoadOptionsFunctions, method: IHttpRequestMethods, resource: string, qs?: IDataObject, body?: IDataObject | undefined): Promise<any>;
