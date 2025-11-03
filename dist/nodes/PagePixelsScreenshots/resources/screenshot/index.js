@@ -15,7 +15,7 @@ const commonOptionFields = [
         description: 'The website\'s time zone (ICU/IANA identifier, e.g. America/New_York)',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'time_zone',
             },
         },
@@ -25,10 +25,10 @@ const commonOptionFields = [
         name: 'wait',
         type: 'number',
         default: 0,
-        description: 'Milliseconds to wait before capturing the screenshot (max 20000)',
+        description: 'Milliseconds to wait before capturing the screenshot (max 20000). If you include Multi-Step Actions, this wait happens after those complete.',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'wait',
             },
         },
@@ -41,243 +41,24 @@ const commonOptionFields = [
         description: 'CSS selector to wait for before capturing the screenshot',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'wait_for',
             },
         },
     },
     {
         displayName: 'Multi-Step Actions',
-        name: 'multiStepActions',
-        type: 'fixedCollection',
-        default: {},
+        name: 'multi_step_actions',
+        type: 'string',
+        default: '[{"type": "click", "selector": "#some-element-on-the-page"}, {"type": "text_field", "selector": "#searchInput", "value": "setting a search input field to a specific value on the webpage."}]',
+        description: 'JSON array of actions to perform on the page before capturing the screenshot (e.g. clicks, text input). See https://pagepixels.com/app/screenshots-api-documentation#multi-step-screenshots for the full multi-step reference documentation.',
         typeOptions: {
-            multipleValues: true,
+            rows: 4,
         },
-        placeholder: 'Add Action',
-        options: [
-            {
-                name: 'click',
-                displayName: 'Click',
-                values: [
-                    {
-                        displayName: 'Selector',
-                        name: 'selector',
-                        type: 'string',
-                        default: '',
-                        description: 'CSS selector to click before capturing the screenshot',
-                    },
-                ],
-            },
-            {
-                name: 'hover',
-                displayName: 'Hover',
-                values: [
-                    {
-                        displayName: 'Selector',
-                        name: 'selector',
-                        type: 'string',
-                        default: '',
-                        description: 'CSS selector to hover over before capturing the screenshot',
-                    },
-                ],
-            },
-            {
-                name: 'change',
-                displayName: 'Change Notification',
-                values: [
-                    {
-                        displayName: 'Selector',
-                        name: 'selector',
-                        type: 'string',
-                        default: '',
-                        description: 'CSS selector that identifies the element to monitor for changes',
-                    },
-                    {
-                        displayName: 'Send To',
-                        name: 'sendTo',
-                        type: 'options',
-                        options: [
-                            { name: 'Slack', value: 'slack' },
-                            { name: 'Webhook', value: 'webhook' },
-                        ],
-                        default: '',
-                        description: 'Where to send the change notification (optional)',
-                    },
-                    {
-                        displayName: 'Webhook URL',
-                        name: 'url',
-                        type: 'string',
-                        default: '',
-                        description: 'Webhook URL to notify when Send To is Webhook',
-                    },
-                    {
-                        displayName: 'Custom ID',
-                        name: 'customId',
-                        type: 'string',
-                        default: '',
-                        description: 'Optional identifier to correlate notifications',
-                    },
-                ],
-            },
-            {
-                name: 'redirect',
-                displayName: 'Goto URL',
-                values: [
-                    {
-                        displayName: 'URL',
-                        name: 'value',
-                        type: 'string',
-                        default: '',
-                        description: 'URL to visit before capturing the screenshot',
-                    },
-                ],
-            },
-            {
-                name: 'javascript',
-                displayName: 'Run Javascript',
-                values: [
-                    {
-                        displayName: 'Script',
-                        name: 'value',
-                        type: 'string',
-                        typeOptions: {
-                            rows: 4,
-                        },
-                        default: '',
-                        description: 'JavaScript to run in the browser before capture',
-                    },
-                ],
-            },
-            {
-                name: 'evaluateJs',
-                displayName: 'Evaluate Javascript',
-                values: [
-                    {
-                        displayName: 'Script',
-                        name: 'value',
-                        type: 'string',
-                        typeOptions: {
-                            rows: 4,
-                        },
-                        default: '',
-                        description: 'Javascript expression to evaluate and return a result',
-                    },
-                ],
-            },
-            {
-                name: 'css',
-                displayName: 'Insert CSS',
-                values: [
-                    {
-                        displayName: 'CSS',
-                        name: 'value',
-                        type: 'string',
-                        typeOptions: {
-                            rows: 4,
-                        },
-                        default: '',
-                        description: 'CSS to inject prior to taking the screenshot',
-                    },
-                ],
-            },
-            {
-                name: 'text_field',
-                displayName: 'Text Field Input',
-                values: [
-                    {
-                        displayName: 'Selector',
-                        name: 'selector',
-                        type: 'string',
-                        default: '',
-                        description: 'CSS selector for the text field',
-                    },
-                    {
-                        displayName: 'Value',
-                        name: 'value',
-                        type: 'string',
-                        default: '',
-                        description: 'Text to enter into the field',
-                    },
-                ],
-            },
-            {
-                name: 'select',
-                displayName: 'Dropdown Field Selection',
-                values: [
-                    {
-                        displayName: 'Selector',
-                        name: 'selector',
-                        type: 'string',
-                        default: '',
-                        description: 'CSS selector for the dropdown field',
-                    },
-                    {
-                        displayName: 'Value',
-                        name: 'value',
-                        type: 'string',
-                        default: '',
-                        description: 'Option value to select',
-                    },
-                ],
-            },
-            {
-                name: 'checkbox',
-                displayName: 'Checkbox Field Input',
-                values: [
-                    {
-                        displayName: 'Selector',
-                        name: 'selector',
-                        type: 'string',
-                        default: '',
-                        description: 'CSS selector for the checkbox input',
-                    },
-                    {
-                        displayName: 'Checked',
-                        name: 'value',
-                        type: 'boolean',
-                        default: true,
-                        description: 'Whether the checkbox should be checked',
-                    },
-                ],
-            },
-            {
-                name: 'submit',
-                displayName: 'Press Enter (Submit)',
-                values: [],
-            },
-            {
-                name: 'wait',
-                displayName: 'Wait X Milliseconds',
-                values: [
-                    {
-                        displayName: 'Milliseconds',
-                        name: 'value',
-                        type: 'string',
-                        default: '',
-                        description: 'Time to wait before continuing (e.g. 5000)',
-                    },
-                ],
-            },
-            {
-                name: 'wait_for_selector',
-                displayName: 'Wait For Selector',
-                values: [
-                    {
-                        displayName: 'Selector',
-                        name: 'selector',
-                        type: 'string',
-                        default: '',
-                        description: 'CSS selector to wait for before proceeding',
-                    },
-                ],
-            },
-        ],
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'multi_step_actions',
-                value: '={{Array.isArray($value) ? $value.map(item => { const entry = Object.entries(item)[0]; if (!entry) return null; const [type, data] = entry; if (!data) return null; const payload = { type }; if (data.selector) payload.selector = data.selector; if (data.value !== undefined && data.value !== null && data.value !== "") payload.value = data.value; if (data.sendTo) payload.send_to = data.sendTo; if (data.url) payload.url = data.url; if (data.customId) payload.custom_id = data.customId; return JSON.stringify(payload); }).filter(item => item) : []}}',
             },
         },
     },
@@ -289,7 +70,7 @@ const commonOptionFields = [
         description: 'Whether to slowly scroll the page to trigger lazy-loaded content',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'incremental_scroll',
             },
         },
@@ -302,7 +83,7 @@ const commonOptionFields = [
         description: 'Viewport width in pixels (default 1920)',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'page_width',
             },
         },
@@ -315,7 +96,7 @@ const commonOptionFields = [
         description: 'Viewport height in pixels (default 1000)',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'page_height',
             },
         },
@@ -328,7 +109,7 @@ const commonOptionFields = [
         description: 'Whether to capture the full scrollable page',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'fullpage',
             },
         },
@@ -341,7 +122,7 @@ const commonOptionFields = [
         description: 'Whether to capture the full page using advanced scrolling for complex content',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'fullpage_advanced',
             },
         },
@@ -354,7 +135,7 @@ const commonOptionFields = [
         description: 'Capture only the element matching this CSS selector',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'selectors',
             },
         },
@@ -367,7 +148,7 @@ const commonOptionFields = [
         description: 'Whether to hover over the selected element before capture',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'hover_on_selected',
             },
         },
@@ -385,7 +166,7 @@ const commonOptionFields = [
         description: 'Image format for the screenshot output',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'image_format',
             },
         },
@@ -398,7 +179,7 @@ const commonOptionFields = [
         description: 'JPEG quality (1-100). Ignored for PNG/WebP.',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'quality',
             },
         },
@@ -415,7 +196,7 @@ const commonOptionFields = [
         description: 'Pixel density multiplier for the screenshot',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'scale_factor',
             },
         },
@@ -431,7 +212,7 @@ const commonOptionFields = [
         },
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'css_inject',
             },
         },
@@ -447,7 +228,7 @@ const commonOptionFields = [
         },
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'js_inject',
             },
         },
@@ -460,7 +241,7 @@ const commonOptionFields = [
         description: 'Override the browser User-Agent string',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'user_agent',
             },
         },
@@ -468,74 +249,32 @@ const commonOptionFields = [
     {
         displayName: 'HTTP Headers',
         name: 'headers',
-        type: 'fixedCollection',
-        default: {},
+        type: 'string',
+        default: '[{"key1": "value1", "key2": "value2"}]',
+        description: 'JSON array of HTTP headers to send with the screenshot request to the URL',
         typeOptions: {
-            multipleValues: true,
+            rows: 3,
         },
-        placeholder: 'Add Header',
-        options: [
-            {
-                name: 'header',
-                displayName: 'Header',
-                values: [
-                    {
-                        displayName: 'Name',
-                        name: 'name',
-                        type: 'string',
-                        default: '',
-                    },
-                    {
-                        displayName: 'Value',
-                        name: 'value',
-                        type: 'string',
-                        default: '',
-                    },
-                ],
-            },
-        ],
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'headers',
-                value: '={{Array.isArray($value) ? $value.filter(item => item.header?.name && item.header?.value).map(item => item.header.name + ":" + item.header.value) : []}}',
             },
         },
     },
     {
         displayName: 'Cookies',
         name: 'cookies',
-        type: 'fixedCollection',
-        default: {},
+        type: 'string',
+        default: '[{"key1": "value1", "key2": "value2"}]',
+        description: 'JSON array of cookies to set for the screenshot request to the URL',
         typeOptions: {
-            multipleValues: true,
+            rows: 3,
         },
-        placeholder: 'Add Cookie',
-        options: [
-            {
-                name: 'cookie',
-                displayName: 'Cookie',
-                values: [
-                    {
-                        displayName: 'Name',
-                        name: 'name',
-                        type: 'string',
-                        default: '',
-                    },
-                    {
-                        displayName: 'Value',
-                        name: 'value',
-                        type: 'string',
-                        default: '',
-                    },
-                ],
-            },
-        ],
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'cookies',
-                value: '={{Array.isArray($value) ? $value.filter(item => item.cookie?.name && item.cookie?.value).map(item => item.cookie.name + "=" + item.cookie.value) : []}}',
             },
         },
     },
@@ -547,7 +286,7 @@ const commonOptionFields = [
         description: 'Milliseconds to cache the screenshot (0 always regenerates)',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'ttl',
             },
         },
@@ -560,7 +299,7 @@ const commonOptionFields = [
         description: 'Value for the Accept-Language request header',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'accept_language',
             },
         },
@@ -573,7 +312,7 @@ const commonOptionFields = [
         description: 'Browser latitude for geolocation APIs',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'latitude',
             },
         },
@@ -586,7 +325,7 @@ const commonOptionFields = [
         description: 'Browser longitude for geolocation APIs',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'longitude',
             },
         },
@@ -599,7 +338,7 @@ const commonOptionFields = [
         description: 'Accuracy radius (meters) for browser geolocation',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'accuracy',
             },
         },
@@ -612,7 +351,7 @@ const commonOptionFields = [
         description: 'Thumbnail width in pixels',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'thumb_width',
             },
         },
@@ -625,7 +364,7 @@ const commonOptionFields = [
         description: 'Thumbnail height in pixels',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'thumb_height',
             },
         },
@@ -638,7 +377,7 @@ const commonOptionFields = [
         description: 'Whether to block ads in the rendered page',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'no_ads',
             },
         },
@@ -651,7 +390,7 @@ const commonOptionFields = [
         description: 'Whether to block analytics and tracking scripts',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'no_tracking',
             },
         },
@@ -664,7 +403,7 @@ const commonOptionFields = [
         description: 'Whether to attempt to hide cookie consent banners',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'no_cookie_banners',
             },
         },
@@ -677,7 +416,7 @@ const commonOptionFields = [
         description: 'Whether to disable all JavaScript execution',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'disable_js',
             },
         },
@@ -690,7 +429,7 @@ const commonOptionFields = [
         description: 'Whether to discard JavaScript from third-party domains',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'disable_third_party_js',
             },
         },
@@ -703,7 +442,7 @@ const commonOptionFields = [
         description: 'Custom title to tag the screenshot',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'custom_title',
             },
         },
@@ -716,7 +455,7 @@ const commonOptionFields = [
         description: 'Internal note or description for the screenshot',
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'custom_description',
             },
         },
@@ -737,8 +476,8 @@ exports.screenshotOperations = [
                 description: 'Capture a web page screenshot and run AI analysis with a custom prompt',
                 routing: {
                     request: {
-                        method: 'GET',
-                        url: '/snap_ai_analysis',
+                        method: 'POST',
+                        url: '/snap',
                         qs: {
                             analyze_image_with_ai: true,
                         },
@@ -752,7 +491,7 @@ exports.screenshotOperations = [
                 description: 'Capture an instant screenshot from a URL',
                 routing: {
                     request: {
-                        method: 'GET',
+                        method: 'POST',
                         url: '/snap',
                     },
                 },
@@ -764,8 +503,8 @@ exports.screenshotOperations = [
                 description: 'Capture screenshots using residential IPs within a chosen location',
                 routing: {
                     request: {
-                        method: 'GET',
-                        url: '/snap_real_location',
+                        method: 'POST',
+                        url: '/snap'
                     },
                 },
             },
@@ -776,7 +515,7 @@ exports.screenshotOperations = [
                 description: 'Render supplied HTML and capture it as an image',
                 routing: {
                     request: {
-                        method: 'GET',
+                        method: 'POST',
                         url: '/snap_html',
                     },
                 },
@@ -801,7 +540,7 @@ exports.screenshotFields = [
         },
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'url',
             },
         },
@@ -824,7 +563,7 @@ exports.screenshotFields = [
         },
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'html_content',
             },
         },
@@ -847,7 +586,7 @@ exports.screenshotFields = [
         },
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'ai_prompt',
             },
         },
@@ -870,7 +609,7 @@ exports.screenshotFields = [
         },
         routing: {
             send: {
-                type: 'query',
+                type: 'body',
                 property: 'proxy_server',
             },
         },
