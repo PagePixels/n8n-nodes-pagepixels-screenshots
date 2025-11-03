@@ -1,6 +1,6 @@
 # n8n-nodes-pagepixels-screenshots
 
-This n8n community node lets you trigger the PagePixels Screenshots API directly from your workflows. Capture high-fidelity website screenshots, render custom HTML, request residential proxy captures, and pair each image with AI-powered analysis — no custom HTTP node required.
+This n8n community node lets you trigger the PagePixels Screenshots API directly from your workflows. Capture high-fidelity website screenshots, render custom HTML, request real location captures (from countries and states around the world), and pair each image with AI-powered analysis, no custom HTTP node required.
 
 [n8n](https://n8n.io/) is a [fair-code licensed](https://docs.n8n.io/sustainable-use-license/) workflow automation platform.
 
@@ -45,7 +45,7 @@ Configure one of the two supported authentication strategies in n8n.
 
 ### OAuth2
 
-1. Register an OAuth app in the PagePixels dashboard or contact support for production credentials.
+1. Register an OAuth app by contacting support for production credentials.
 2. In n8n, create a **PagePixels OAuth2 API** credential.
 3. Use `https://pagepixels.com/oauth/authorize` as the authorization URL and `https://pagepixels.com/oauth/token` as the access token URL (defaults are pre-filled).
 4. Enter your client ID and client secret, then complete the OAuth handshake when prompted in a workflow.
